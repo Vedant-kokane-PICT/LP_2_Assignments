@@ -68,3 +68,21 @@ int main() {
 
     return 0;
 }
+
+
+/*
+Graph:
+Vertex 0: (1, 1) (2, 4)
+Vertex 1: (0, 1) (2, 2) (3, 5)
+Vertex 2: (0, 4) (1, 2) (3, 1)
+Vertex 3: (1, 5) (2, 1) (4, 7)
+Vertex 4: (3, 7)
+
+Shortest distances from vertex 0:
+To vertex 0: 0
+To vertex 1: 1
+To vertex 2: 3
+To vertex 3: 4
+To vertex 4: 11
+
+*/
