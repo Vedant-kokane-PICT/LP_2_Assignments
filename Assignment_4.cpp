@@ -1,72 +1,75 @@
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
 
-class Solution {
-private:
-    int size;
-    vector<int> queens; // queens[i] represents the column of the queen in row i
 
+class NQueens{
+	int size;
+	vector<vector<string>> ans;
 public:
-    Solution(int n){
-        size = n;
-        queens = vector<int>(n,-1);
-    }
+	NQueens(int n){
+		size = n;
+	}
+	
+	void solve(){
+		vector<string> board(size);
+		string s(size,'.');
+		for(int i=0;i<size;i++){
+			board[i] = s;
+		}
+		vector<bool> rowLeft(size,0);
+		vector<bool> lowerDiagonal(2 * size - 1,0);
+		vector<bool> upperDiagonal(2 * size - 1,0);
 
-    bool isSafe(int row, int col) {
-        for (int i = 0; i < row; ++i) {
-            if (queens[i] == col || abs(queens[i] - col) == abs(i - row)) {
-                return false;
-            }
+		helper(0,board,rowLeft,lowerDiagonal,upperDiagonal);
+
+		print();
+	}
+
+	void helper(int col,vector<string> &board,vector<bool> &rowLeft,vector<bool> &lowerDiagonal,vector<bool> &upperDiagonal){
+		if(col == size){
+			ans.push_back(board);
+			return;
+		}
+
+		for(int row = 0;row<size ;row++){
+			if(rowLeft[row] == 0 && lowerDiagonal[row+col] == 0 && upperDiagonal[(size-1) + (col-row)] == 0){
+				board[row][col] = 'Q';
+				rowLeft[row] = 1;
+				lowerDiagonal[row+col] = 1;
+				upperDiagonal[(size-1) + (col-row)] = 1;
+				helper(col+1,board,rowLeft,lowerDiagonal,upperDiagonal);
+				board[row][col] = '.';
+				rowLeft[row] = 0;
+				lowerDiagonal[row+col] = 0;
+				upperDiagonal[(size-1) + (col-row)] = 0;
+			}
+		}
+	}
+
+	void print() {
+        if (ans.empty()) {
+            cout << "No solution found." << endl;
+            return;
         }
-        return true;
-    }
-
-    void printBoard() {
-        for (int i = 0; i < size; ++i) {
-            for (int j = 0; j < size; ++j) {
-                if (queens[i] == j) {
-                    cout << "Q ";
-                } else {
-                    cout << ". ";
-                }
+        for (auto sol:ans[0]) {
+            for (auto x : sol) {
+                cout << x << " ";
             }
             cout << endl;
         }
-        cout << endl;
-    }
-
-    bool solveBranchAndBound(int row) {
-        if (row == size) {
-            // All queens are placed successfully
-            printBoard();
-            return true;
-        }
-
-        for (int col = 0; col < size; ++col) {
-            if (isSafe(row, col)) {
-                queens[row] = col;
-                if (solveBranchAndBound(row + 1)) {
-                    return true;
-                }
-                queens[row] = -1;
-            }
-        }
-        return false;
     }
 
 
-    void solve() {
-        solveBranchAndBound(0);
-    }
 };
 
-int main() {
+
+int main(){
     int n;
-    cout << "Enter the size of chessboard -: ";
-    cin >> n;
-    Solution obj(n);
-    obj.solve();
-    return 0;
+    cout<<"Enter the size of chessboard - "<<endl;
+    cin>>n;
+	NQueens object(n);
+	object.solve();
+	return 0;
 }
 
 
