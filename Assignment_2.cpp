@@ -1,14 +1,11 @@
 // Vedant Kokane
 // 31430
 
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <limits>
 
+#include <bits/stdc++.h>
 using namespace std;
-
 #define INF 1e9
+
 
 class Graph {
 public:
@@ -18,13 +15,14 @@ public:
     Graph(int V) : vertices(V), adj(V) {}
 
     void addEdge(int u, int v, int w) {
-        adj[u].emplace_back(v, w);
-        adj[v].emplace_back(u, w); 
+        adj[u].push_back({v, w});
+        adj[v].push_back({u, w}); 
     }
 
-    vector<int> dijkstra(int start) {
+    pair<vector<int>, vector<int>> dijkstra(int start) {
         vector<int> dist(vertices, INF);
         dist[start] = 0;
+        vector<int> parent(vertices, -1);
         
         priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 
@@ -40,17 +38,40 @@ public:
                 
                 if (edgeWeight + dis < dist[adjNode]) {
                     dist[adjNode] = edgeWeight + dis;
+                    parent[adjNode] = node; 
                     pq.push({dist[adjNode], adjNode});
                 }
             }
         }
 
-        return dist;
+        return {dist,parent};
     }
+    
+    void printPath(vector<int>& parent, int start, int end, vector<string>& cities) {
+        stack<int> path;
+        int current = end;
+
+        // Reconstruct the path using the parent array
+        while (current != -1) {
+            path.push(current);
+            current = parent[current];
+        }
+
+        // Print the path
+        cout << "Shortest path from " << cities[start] << " to " << cities[end] << ": ";
+        while (!path.empty()) {
+            cout << cities[path.top()];
+            path.pop();
+            if (!path.empty()) cout << " -> ";
+        }
+        cout << endl;
+    }
+
 };
 
 int main() {
     Graph graph(5);
+    vector<string> cities = {"Pune", "Mumbai", "Delhi", "Chennai", "Banglore"};
     graph.addEdge(0, 1, 1);
     graph.addEdge(0, 2, 4);
     graph.addEdge(1, 2, 2);
@@ -58,14 +79,19 @@ int main() {
     graph.addEdge(2, 3, 1);
     graph.addEdge(3, 4, 7);
     
-    int startVertex = 0;
-    vector<int> shortestDistances = graph.dijkstra(startVertex);
+    int startVertex = 1;
+    pair<vector<int>, vector<int>> result = graph.dijkstra(startVertex);
+    vector<int> shortestDistances = result.first;
+    vector<int> parent = result.second;
 
-    cout << "Shortest distances from vertex " << startVertex << ":\n";
+    cout << "Shortest distances from city " << cities[startVertex] << ":\n";
     for (int i = 0; i < graph.vertices; ++i) {
-        cout << "To vertex " << i << ": " << shortestDistances[i] << endl;
+        cout << "from "<<cities[startVertex] <<" to " << cities[i] << ": " << shortestDistances[i] << endl;
     }
-
+    
+    int destinationVertex = 4; // Banglore
+    graph.printPath(parent, startVertex, destinationVertex, cities);
+    
     return 0;
 }
 
@@ -78,11 +104,11 @@ Vertex 2: (0, 4) (1, 2) (3, 1)
 Vertex 3: (1, 5) (2, 1) (4, 7)
 Vertex 4: (3, 7)
 
-Shortest distances from vertex 0:
-To vertex 0: 0
-To vertex 1: 1
-To vertex 2: 3
-To vertex 3: 4
-To vertex 4: 11
+from Mumbai to Pune: 1
+from Mumbai to Mumbai: 0
+from Mumbai to Delhi: 2
+from Mumbai to Chennai: 3
+from Mumbai to Banglore: 10
+
 
 */
